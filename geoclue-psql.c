@@ -16,6 +16,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <geoclue.h>
+#include <stdio.h>
+
+static GClueAccuracyLevel accuracy_level = GCLUE_ACCURACY_LEVEL_EXACT;
+
 int main(int argc, char* argv[]) {
+  GError *error = NULL;
+  GClueSimple *client = gclue_simple_new_sync(
+    "geoclue-psql",
+    accuracy_level,
+    NULL,
+    &error
+  );
+  if (error) {
+    fprintf(stderr, "%s\n", error->message);
+    return error->code;
+  }
   return 0;
 }
