@@ -32,7 +32,7 @@ void on_location_updated(GClueSimple *simple) {
   );
 }
 
-int main(int argc, char* argv[]) {
+GClueSimple* connect_geoclue() {
   GError *error = NULL;
   GClueSimple *client = gclue_simple_new_sync(
     "geoclue-psql",
@@ -42,8 +42,14 @@ int main(int argc, char* argv[]) {
   );
   if (error) {
     fprintf(stderr, "%s\n", error->message);
-    return error->code;
+    exit(error->code);
   }
+
+  return client;
+}
+
+int main(int argc, char* argv[]) {
+  GClueSimple *client = connect_geoclue();
 
   g_signal_connect(
     client,
