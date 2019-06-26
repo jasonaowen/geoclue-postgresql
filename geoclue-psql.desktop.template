@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=geoclue-psql
+Comment=Log location to PostgreSQL
+Type=Application
+Encoding=UTF-8
+Exec={fixme}/geoclue-psql/build/geoclue-psql
+NoDisplay=true
+Terminal=true
+X-Geoclue-Reason=Allows the geoclue-psql service to log your location to PostgreSQL.

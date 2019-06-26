@@ -13,6 +13,18 @@ On Debian / Ubuntu, they are in the package `libgeoclue-2-dev`:
 $ sudo apt install libgeoclue-2-dev
 ```
 
+## GeoClue service permission
+
+In order for the application to have access to the GeoClue service,
+you must customize and install the desktop file:
+
+```ShellSession
+$ mkdir -p ~/.local/share/applications/
+$ cp geoclue-psql.desktop.template ~/.local/share/applications/geoclue-psql.desktop
+```
+
+Then, edit the file to set the full path of the executable.
+
 ## Building
 
 This project uses the [CMake](https://cmake.org/) build system.
