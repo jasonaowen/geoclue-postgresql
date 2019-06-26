@@ -17,9 +17,20 @@
  */
 
 #include <geoclue.h>
+#include <glib.h>
 #include <stdio.h>
 
 static GClueAccuracyLevel accuracy_level = GCLUE_ACCURACY_LEVEL_EXACT;
+
+void on_location_updated(GClueSimple *simple) {
+  GClueLocation *location = gclue_simple_get_location(simple);
+  printf(
+    "Location updated:\n  Longitude: %f\n  Latitude: %f\n  Accuracy: %f\n",
+    gclue_location_get_longitude(location),
+    gclue_location_get_latitude(location),
+    gclue_location_get_accuracy(location)
+  );
+}
 
 int main(int argc, char* argv[]) {
   GError *error = NULL;
@@ -33,5 +44,16 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "%s\n", error->message);
     return error->code;
   }
+
+  g_signal_connect(
+    client,
+    "notify::location",
+    G_CALLBACK(on_location_updated),
+    NULL
+  );
+
+  GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
+  g_main_loop_run(main_loop);
+
   return 0;
 }

@@ -5,12 +5,12 @@ A simple service to listen for geoclue events and log them to PostgreSQL.
 ## Dependencies
 
 In order to build this program,
-the GeoClue development headers must be installed.
+the GeoClue and GLib development headers must be installed.
 
-On Debian / Ubuntu, they are in the package `libgeoclue-2-dev`:
+On Debian / Ubuntu, they are in the packages `libgeoclue-2-dev` and `libglib2.0-dev`:
 
 ```ShellSession
-$ sudo apt install libgeoclue-2-dev
+$ sudo apt install libgeoclue-2-dev libglib2.0-dev
 ```
 
 ## GeoClue service permission
