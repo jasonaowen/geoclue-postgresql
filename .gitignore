@@ -1,5 +1,6 @@
 build/
 geoclue-psql.desktop
+.env
 
 ## C gitignore, from https://github.com/github/gitignore/blob/7aec8fdf3287f253ddfd91b9fa18199f415eb87e/C.gitignore
 # Prerequisites

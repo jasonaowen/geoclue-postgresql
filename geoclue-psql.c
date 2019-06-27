@@ -18,6 +18,7 @@
 
 #include <geoclue.h>
 #include <glib.h>
+#include <libpq-fe.h>
 #include <stdio.h>
 
 static GClueAccuracyLevel accuracy_level = GCLUE_ACCURACY_LEVEL_EXACT;
@@ -48,8 +49,25 @@ GClueSimple* connect_geoclue() {
   return client;
 }
 
+PGconn* connect_postgresql() {
+  char *database_url = getenv("DATABASE_URL");
+  if (database_url == NULL) {
+    fprintf(stderr, "Please set the DATABASE_URL environment variable.\n");
+    exit(1);
+  }
+
+  PGconn *conn = PQconnectdb(database_url);
+  if (PQstatus(conn) != CONNECTION_OK) {
+    fprintf(stderr, "Could not connect to database: %s", PQerrorMessage(conn));
+    exit(1);
+  }
+
+  return conn;
+}
+
 int main(int argc, char* argv[]) {
   GClueSimple *client = connect_geoclue();
+  PGconn *connection = connect_postgresql();
 
   g_signal_connect(
     client,

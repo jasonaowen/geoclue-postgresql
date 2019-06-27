@@ -5,12 +5,13 @@ A simple service to listen for geoclue events and log them to PostgreSQL.
 ## Dependencies
 
 In order to build this program,
-the GeoClue and GLib development headers must be installed.
+the GeoClue, GLib, and libpq development headers must be installed.
 
-On Debian / Ubuntu, they are in the packages `libgeoclue-2-dev` and `libglib2.0-dev`:
+On Debian / Ubuntu, they are in the packages `libgeoclue-2-dev`,
+`libglib2.0-dev`, and `libpq-dev`, respectively:
 
 ```ShellSession
-$ sudo apt install libgeoclue-2-dev libglib2.0-dev
+$ sudo apt install libgeoclue-2-dev libglib2.0-dev libpq-dev
 ```
 
 ## GeoClue service permission
@@ -34,6 +35,26 @@ $ mkdir build
 $ cd build
 $ cmake ..
 $ make
+```
+
+## Running
+
+The application looks at the `DATABASE_URL` environment variable,
+which should be a
+[libpq connection string](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING),
+such as `postgres:///geoclue`.
+
+Copy the `.env.template` to `.env`, edit it, and source it:
+
+```ShellSession
+$ cp .env.template .env
+$ vim .env
+$ source .env
+```
+
+Then, run the built program:
+
+```ShellSession
 $ ./geoclue-psql
 ```
 
