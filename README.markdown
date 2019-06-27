@@ -37,6 +37,17 @@ $ cmake ..
 $ make
 ```
 
+## Database
+
+Create a PostgreSQL database, and run `schema.sql`.
+
+For example, on Debian/Ubuntu, to prepare a database called `geoclue`:
+
+```ShellSession
+$ sudo -u postgres createdb --owner=$(whoami) geoclue
+$ psql geoclue < schema.sql
+```
+
 ## Running
 
 The application looks at the `DATABASE_URL` environment variable,
