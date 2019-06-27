@@ -22,15 +22,73 @@
 #include <stdio.h>
 
 static GClueAccuracyLevel accuracy_level = GCLUE_ACCURACY_LEVEL_EXACT;
+static size_t max_float_str_len = 32;
 
-void on_location_updated(GClueSimple *simple) {
+gchar *timestamp_to_str(GVariant *timestamp) {
+  GTimeVal time_val = {0};
+  g_variant_get(timestamp, "(tt)", &time_val.tv_sec, &time_val.tv_usec);
+  GDateTime *date_time = g_date_time_new_from_timeval_local(&time_val);
+  return g_date_time_format(date_time, "%FT%T%z");
+}
+
+void on_location_updated(
+    GClueSimple *simple,
+    GParamSpec *spec,
+    PGconn *connection
+) {
   GClueLocation *location = gclue_simple_get_location(simple);
+  char longitude[max_float_str_len];
+  char latitude[max_float_str_len];
+  char accuracy[max_float_str_len];
+  char altitude[max_float_str_len];
+  char speed[max_float_str_len];
+  char heading[max_float_str_len];
+  snprintf(longitude, max_float_str_len, "%f", gclue_location_get_longitude(location));
+  snprintf(latitude, max_float_str_len, "%f", gclue_location_get_latitude(location));
+  snprintf(accuracy, max_float_str_len, "%f", gclue_location_get_accuracy(location));
+  snprintf(altitude, max_float_str_len, "%f", gclue_location_get_accuracy(location));
+  snprintf(speed, max_float_str_len, "%f", gclue_location_get_speed(location));
+  snprintf(heading, max_float_str_len, "%f", gclue_location_get_heading(location));
+  char *timestamp = timestamp_to_str(gclue_location_get_timestamp(location));
+
   printf(
-    "Location updated:\n  Longitude: %f\n  Latitude: %f\n  Accuracy: %f\n",
-    gclue_location_get_longitude(location),
-    gclue_location_get_latitude(location),
-    gclue_location_get_accuracy(location)
+    "Location updated:\n  Longitude: %s\n  Latitude: %s\n  Accuracy: %s\n",
+    longitude,
+    latitude,
+    accuracy
   );
+
+  const char *params[8];
+  params[0] = timestamp;
+  params[1] = longitude;
+  params[2] = latitude;
+  params[3] = accuracy;
+  params[4] = altitude;
+  params[5] = speed;
+  params[6] = heading;
+  params[7] = gclue_location_get_description(location);
+
+  PGresult *result = PQexecParams(
+    connection,
+    "INSERT INTO location_history( \
+      \"timestamp\", longitude, latitude, accuracy, \
+      altitude, speed, heading, description) \
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) \
+      ON CONFLICT DO NOTHING;",
+    8,
+    NULL,
+    params,
+    NULL,
+    NULL,
+    0
+  );
+
+  if (PQresultStatus(result) != PGRES_COMMAND_OK) {
+    fprintf(stderr, "Error inserting into database: %s", PQerrorMessage(connection));
+    exit(2);
+  }
+
+  g_free(timestamp);
 }
 
 GClueSimple* connect_geoclue() {
@@ -73,7 +131,7 @@ int main(int argc, char* argv[]) {
     client,
     "notify::location",
     G_CALLBACK(on_location_updated),
-    NULL
+    connection
   );
 
   GMainLoop *main_loop = g_main_loop_new(NULL, FALSE);
